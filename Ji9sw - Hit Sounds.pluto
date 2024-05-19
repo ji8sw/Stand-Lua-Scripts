@@ -1,0 +1,73 @@
+util.require_natives("3095a")
+local PlayRate = 50
+
+local function PlayFile(File)
+    local wav = soup.audWav( soup.FileReader(File))
+    local dev = soup.audDevice.getDefault()
+    local pb = dev:open(wav.channels)
+    local mix = soup.audMixer()
+    mix.stop_playback_when_done = true
+    mix:setOutput(pb)
+    mix:playSound(wav)
+end
+
+function GetFilenameWithoutExtension(Path)
+    local name = Path:match("^.+/(.+)%..+$")
+    if not name then
+      name = Path:match("^.+/(.+)$")
+    end
+    return name or Path:match("(.+)%..+$") or Path
+end
+
+menu.my_root():toggle_loop("Shoot Sounds", {}, "Play sounds when you shoot bullets", function()
+	if WEAPON.IS_PED_ARMED(players.user_ped(), 4) and PAD.IS_CONTROL_PRESSED(0, 24) and PLAYER.IS_PLAYER_FREE_AIMING(players.user()) then
+        PlayFile(filesystem.resources_dir() .. "\\Ji9sw\\HitSound.wav")
+        util.yield(PlayRate)
+	end
+end)
+
+menu.my_root():toggle_loop("Hit Sounds", {}, "Play sounds when your bullet hits things", function()
+    local OutCoords = v3.new()
+	if WEAPON.GET_PED_LAST_WEAPON_IMPACT_COORD(players.user_ped(), OutCoords) then
+        PlayFile(filesystem.resources_dir() .. "\\Ji9sw\\HitSound.wav")
+	end
+end)
+
+menu.my_root():toggle_loop("Hitmarker Sounds", {}, "Play sounds when your bullet hits people", function()
+    local OutCoords = v3.new()
+	if WEAPON.GET_PED_LAST_WEAPON_IMPACT_COORD(players.user_ped(), OutCoords) then
+        for entities.get_all_peds_as_handles() as Ped do
+            if ENTITY.IS_ENTITY_AT_COORD(Ped, OutCoords.x, OutCoords.y, OutCoords.z, 0.8, 0.8, 0.8, false, true, 0) then -- If someone can tell me how to do this properly do tell :3
+                PlayFile(filesystem.resources_dir() .. "\\Ji9sw\\HitSound.wav")
+                break
+            end
+        end
+	end
+end)
+
+menu.my_root():action("Test Sound", {}, "Test out your sound", function()
+    PlayFile(filesystem.resources_dir() .. "\\Ji9sw\\HitSound.wav")
+end)
+
+menu.my_root():click_slider("Change Rate (MS)", {}, "The time between the sound playing when using Shoot Sounds", 1, 1000, 50, 5, function(Amount)
+    PlayRate = Amount
+end)
+
+local SongList = menu.my_root():list("My Songs", {}, "List of songs")
+
+local SongFileList = filesystem.list_files($"{filesystem.scripts_dir()}/resources/ji9sw/MusicPlayer/")
+for SongFileList as SongPath do
+    if not SongPath:match("%.wav$") then table.remove(SongFileList[SongPath]) continue end
+    SongList:action(GetFilenameWithoutExtension(SongPath), {}, "", function()
+        PlayFile(SongPath)
+    end)
+end
+util.toast("Found " .. #SongFileList .. " songs!")
+
+menu.my_root():action("Support (Hit Sounds)", {}, "Click for help", function()
+    util.toast("Hit Sounds has 3 file requirements: \n1. The file has to be of .wav extension and be properly formated (no renaming from .mp3)\n2. The file has to be placed inside: 'Stand > Lua Scripts > Resources > Ji9sw' inside file explorer\n 3. The file must be named 'HitSound.wav'")
+end)
+
+menu.my_root():action("Support (Music Player)", {}, "Click for help", function()
+    util.toast("Music Player has 2 file requirements: \n1. The file has to be of .wav extension and be properly formated (no renaming from .mp3)\n2. The file has to be placed inside: 'Stand > Lua Scripts > Resources > Ji9sw > Music Player' inside file explorer")
+end)

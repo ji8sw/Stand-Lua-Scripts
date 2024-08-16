@@ -8,18 +8,32 @@ function GetGlobalInt(address)
     return memory.read_int(memory.script_global(address))
 end
 
+function GetWeaponHash(HashOrString)
+
+    util.toast("in: " .. HashOrString)
+    for Index, WeaponInfo in ipairs(util.get_weapons()) do
+        if WeaponInfo.hash == HashOrString then
+            return WeaponInfo.hash
+        elseif util.joaat(HashOrString) == WeaponInfo.hash then
+            return WeaponInfo.hash
+        end
+    end
+
+    return 0
+end
+
 ----------------------- VARIABLES ------------------------ 
 
 util.require_natives("3095a")
 
 local Globals = 
 {
-    Position = 2652572 + 2650, -- Line 3949
-    WeaponSlots = 262145 + 34328, -- Line 34887
-    WeaponDiscount = 262145 + 34339, -- Line 34889
-    ThrowableSlots = 262145 + 34350, -- Line 34903
-    ThrowableDiscount = 262145 + 34354, -- Line 34905
-    ArmourDiscount = 262145 + 34358 -- Line 34917
+    Position = 2652592 + 2671, -- Line 3950
+    WeaponSlots = 262145 + 33273, 295418, -- Line 79910
+    WeaponDiscount = 262145 + 33284, -- Line 34309
+    ThrowableSlots = 262145 + 33295, -- Line 34323
+    ThrowableDiscount = 262145 + 33299, -- Line 34325
+    ArmourDiscount = 262145 + 33303 -- Line 34337
 }
 
 local SelectedSlot = 1
@@ -33,11 +47,15 @@ local GunVanCoords = { {-29.532, 6435.136, 31.162}, {1705.214, 4819.167, 41.75},
 
  menu.my_root():click_slider("1. Choose Gun Van Slot", {}, "Choose the gun van slot to modify from 1-10", 1, 10, 1, 1, function(SlotID) -- The slot ID needs to have an extra 1, the array is actually 0-9 but GTA is dumb
     SelectedSlot = SlotID
-    util.toast("slot #" .. SelectedSlot .. " selected, proceed to step 2.")
+    util.toast("Slot #" .. SelectedSlot .. " selected, proceed to step 2.")
  end)
 
- menu.my_root():text_input("2. Modify Gun Van Slot", {'SetGVSlot '}, "Set the gunvan slot to the weapon hash \nFound at: https://wiki.rage.mp/index.php?title=Weapons", function(Input)
-    SetGlobalInt(Globals.WeaponSlots + SelectedSlot, util.joaat(Input))
+ menu.my_root():text_input("2. Modify Gun Van Slot", {'SetGVSlot '}, "Set the gunvan slot to the weapon ID\nFound at: https://wiki.rage.mp/index.php?title=Weapons", function(Input)   
+    Input = GetWeaponHash(Input)
+
+    util.toast(Input)
+    
+    SetGlobalInt(Globals.WeaponSlots + SelectedSlot, Input)
     util.toast("This weapon is now in the gun van in slot #" .. SelectedSlot .. ".")
 end)
 
@@ -93,6 +111,31 @@ menu.my_root():click_slider("Set Gun Van Position", {}, "Choose the gun van posi
     util.toast("The Gun Van has been restored.")
  end)
 
+ menu.my_root():action("Get Current Weapon", {}, "", function()
+    local WeaponHash = memory.alloc_int()
+    local HasWeapon = WEAPON.GET_CURRENT_PED_WEAPON(players.user_ped(), WeaponHash, true)
+
+    if not HasWeapon then
+        util.toast("No Current Weapon.")
+        return
+    end
+
+    util.toast("Hash: " .. memory.read_int(WeaponHash) .. "\nModel: " .. util.reverse_joaat(memory.read_int(WeaponHash)))
+ end)
+
+ menu.my_root():action("Set To Current Weapon", {}, "", function()
+    local WeaponHash = memory.alloc_int()
+    local HasWeapon = WEAPON.GET_CURRENT_PED_WEAPON(players.user_ped(), WeaponHash, true)
+
+    if not HasWeapon then
+        util.toast("No Current Weapon.")
+        return
+    end
+
+    SetGlobalInt(Globals.WeaponSlots + SelectedSlot, memory.read_int(WeaponHash))
+    util.toast("Applied current weapon to slot #" .. SelectedSlot)
+ end)
+
  menu.my_root():action("Read Me", {}, "Please note that lots of weapons cant be bought from the Gun Van, such as the candy cane or other limited time collectables, also note that the Weapons tab can only contain weapons and not things like grenades.", function()
     util.toast("Please note that lots of weapons cant be bought from the Gun Van, such as the candy cane or other limited time collectables, also note that the Weapons tab can only contain weapons and not things like grenades.")
 end)
@@ -101,10 +144,10 @@ end)
 
  ThrowableMenu:click_slider("1. Choose Gun Van Slot", {}, "Choose the gun van slot to modify from 1-3", 1, 3, 1, 1, function(SlotID) -- The slot ID needs to have an extra 1, the array is actually 0-9 but GTA is dumb
     SelectedSlot_Throwables = SlotID
-    util.toast("slot #" .. SelectedSlot_Throwables .. " selected, proceed to step 2.")
+    util.toast("Slot #" .. SelectedSlot_Throwables .. " selected, proceed to step 2.")
  end)
 
-ThrowableMenu:text_input("2. Modify Gun Van Slot", {'SetGVSlot2 '}, "Set the gunvan slot to the weapon hash \nFound at: https://wiki.rage.mp/index.php?title=Weapons", function(Input)
+ThrowableMenu:text_input("2. Modify Gun Van Slot", {'SetGVSlot2 '}, "Set the gunvan slot to the weapon ID \nFound at: https://wiki.rage.mp/index.php?title=Weapons", function(Input)
     SetGlobalInt(Globals.ThrowableSlots + SelectedSlot_Throwables, util.joaat(Input))
 
     util.toast("This weapon is now in the gun van in slot #" .. SelectedSlot_Throwables .. ".")
@@ -114,5 +157,11 @@ ThrowableMenu:action("Read Me", {}, "Please note that the Throwables tab can onl
     util.toast("Please note that the Throwables tab can only contain throwables like grenades.")
 end)
 
--- Source: gunclub_shop.c
--- Author: ji9sw
+--[[ Commits / Credits : 
+
+ji9sw: Original Author, Various Language Translations ( FIND IN STAND DISCORD )
+Global Source: gunclub_shop.c [https://github.com/root-cause/v-decompiled-scripts/blob/master/gunclub_shop.c]
+parci0_0: Updated for game version 1.69-3258
+frog_e123: Original Korean Translation
+
+-- Commits / Credits ]]

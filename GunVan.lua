@@ -24,16 +24,16 @@ end
 
 ----------------------- VARIABLES ------------------------ 
 
-util.require_natives("3095a")
+util.require_natives("3274a")
 
 local Globals = 
 {
-    Position = 2652592 + 2671, -- Line 3950
-    WeaponSlots = 262145 + 33273, 295418, -- Line 79910
-    WeaponDiscount = 262145 + 33284, -- Line 34309
-    ThrowableSlots = 262145 + 33295, -- Line 34323
-    ThrowableDiscount = 262145 + 33299, -- Line 34325
-    ArmourDiscount = 262145 + 33303 -- Line 34337
+    Position = 2652568 + 2706, -- Line 3962 (int func_14())
+    WeaponSlots = 262145 + 33273, -- Line 33556
+    WeaponDiscount = 262145 + 33284, -- Line 34648
+    ThrowableSlots = 262145 + 33295, -- Line 34662
+    ThrowableDiscount = 262145 + 33299, -- Line 18117
+    ArmourDiscount = 262145 + 33303 -- Line 34676
 }
 
 local SelectedSlot = 1
@@ -85,6 +85,7 @@ menu.my_root():action("Optimal Gun Van Slots", {}, "Adds a few cool weapons like
 end)
 
 menu.my_root():action("Teleport To Gun Van", {}, "Teleports you to the gun van", function()
+    util.toast(CurrentPosition)
     if not GunVanCoords[CurrentPosition] then
         util.toast("This event is currently innactive")
     else 
@@ -136,8 +137,8 @@ menu.my_root():click_slider("Set Gun Van Position", {}, "Choose the gun van posi
     util.toast("Applied current weapon to slot #" .. SelectedSlot)
  end)
 
- menu.my_root():action("Read Me", {}, "Please note that lots of weapons cant be bought from the Gun Van, such as the candy cane or other limited time collectables, also note that the Weapons tab can only contain weapons and not things like grenades.", function()
-    util.toast("Please note that lots of weapons cant be bought from the Gun Van, such as the candy cane or other limited time collectables, also note that the Weapons tab can only contain weapons and not things like grenades.")
+ menu.my_root():action("Read Me", {}, "Please note that lots of weapons cant be bought from the Gun Van, such as the candy cane or other limited time collectables, also note that the Weapons tab can only contain weapons and not things like grenades. If you experience issues try restarting the script.", function()
+    util.toast("Please note that lots of weapons cant be bought from the Gun Van, such as the candy cane or other limited time collectables, also note that the Weapons tab can only contain weapons and not things like grenades. If you experience issues try restarting the script.")
 end)
 
  local ThrowableMenu = menu.my_root():list("Throwables", {}, "Manage the throwables slots instead of weapons")

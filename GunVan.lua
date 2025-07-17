@@ -9,8 +9,6 @@ function GetGlobalInt(address)
 end
 
 function GetWeaponHash(HashOrString)
-
-    util.toast("in: " .. HashOrString)
     for Index, WeaponInfo in ipairs(util.get_weapons()) do
         if WeaponInfo.hash == HashOrString then
             return WeaponInfo.hash
@@ -28,7 +26,7 @@ util.require_natives("3274a")
 
 local Globals = 
 {
-    Position = 2652568 + 2706, -- Line 3962 (int func_14())
+    Position = 2652584 + 2706, -- Line 3962 (int func_14())
     WeaponSlots = 262145 + 33273, -- Line 33556
     WeaponDiscount = 262145 + 33284, -- Line 34648
     ThrowableSlots = 262145 + 33295, -- Line 34662
@@ -52,9 +50,6 @@ local GunVanCoords = { {-29.532, 6435.136, 31.162}, {1705.214, 4819.167, 41.75},
 
  menu.my_root():text_input("2. Modify Gun Van Slot", {'SetGVSlot '}, "Set the gunvan slot to the weapon ID\nFound at: https://wiki.rage.mp/index.php?title=Weapons", function(Input)   
     Input = GetWeaponHash(Input)
-
-    util.toast(Input)
-    
     SetGlobalInt(Globals.WeaponSlots + SelectedSlot, Input)
     util.toast("This weapon is now in the gun van in slot #" .. SelectedSlot .. ".")
 end)

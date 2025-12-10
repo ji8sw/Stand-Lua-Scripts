@@ -26,12 +26,12 @@ util.require_natives("3274a")
 
 local Globals = 
 {
-    Position = 2652584 + 2706, -- Line 3962 (int func_14())
-    WeaponSlots = 262145 + 33273, -- Line 33556
-    WeaponDiscount = 262145 + 33284, -- Line 34648
-    ThrowableSlots = 262145 + 33295, -- Line 34662
-    ThrowableDiscount = 262145 + 33299, -- Line 18117
-    ArmourDiscount = 262145 + 33303 -- Line 34676
+    Position = 2652579 + 2706, -- (int/hash func_14()) [x]
+    WeaponSlots = 262145 + 33361, -- if (iParam4 > 9 || [x]
+    WeaponDiscount = 262145 + 33778, -- if (((((((((((((((((!PLAYER::IS_PLAYER_READY_FOR_CUTSCENE, next if statement [x]
+    ThrowableSlots = 262145 + 33383, -- if (iParam4 > 2 || ! [x]
+    ThrowableDiscount = 262145 + 33776, -- case joaat("weapon_pistol"): \nreturn 259; calls func_~58, which uses the global [x]
+    ArmourDiscount = 262145 + 33303 -- Line 34676 []
 }
 
 local SelectedSlot = 1
@@ -80,7 +80,6 @@ menu.my_root():action("Optimal Gun Van Slots", {}, "Adds a few cool weapons like
 end)
 
 menu.my_root():action("Teleport To Gun Van", {}, "Teleports you to the gun van", function()
-    util.toast(CurrentPosition)
     if not GunVanCoords[CurrentPosition] then
         util.toast("This event is currently innactive")
     else 
